@@ -1,2 +1,3 @@
-# pcars2
-Project CARS 2 Leaderboard Scraper
+# Project CARS 2 Leaderboard Scaper
+
+TODO: Test and fix bugs.

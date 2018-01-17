@@ -55,7 +55,7 @@ class ProjectCARS2(object):
 	# Return the sum of all sector times in "m:ss.nnn"
 	def format_time(self, sector_times):
 		ms = sum(sector_times) if isinstance(sector_times, list) else sector_times
-		return "%d:%02d.%03d" % (ms/(60*1000), (ms/1000)%60, ms%1000)
+		return "%02d:%02d.%03d" % (ms/(60*1000), (ms/1000)%60, ms%1000)
 
 	def get_leaderboard(self, track, vehicle=0):
 		track = int(track)
@@ -77,26 +77,32 @@ class ProjectCARS2(object):
 				"sector_times": sector_times,
 				"time": self.format_time(sector_times),
 				"vehicle": get_td(tr, "vehicle").text if vehicle == 0 else self.vehicle_by_id[vehicle],
-				#"gap": get_td(tr, "gap").text,
+				"gap": get_td(tr, "gap").text,
 				"timestamp": get_td(tr, "timestamp").text
 			})
 
 		return sorted(leaderboard, key=itemgetter("time"))
 
+	def print_leaderboard(self, lb):
+		for row in lb:
+			print "%s: %-25.25s %s %s %s" % (
+				row["rank"],
+				row["user"],
+				row["time"],
+				row["vehicle"],
+				row["gap"]
+			)
+
 def main():
 	pc2 = ProjectCARS2()
 
-	#for k, v in pc2.tracks.iteritems():
-	#	if "Texas" in k:
-	#		print k, v
-
-	# Texas Motor Speedway Road Course = 533066470
-	lb = pc2.get_leaderboard(533066470, 3019822479)
-	#lb = pc2.get_leaderboard(533066470, 1278633095)
-	#lb = pc2.get_leaderboard(533066470, 4253159674)
-	for row in lb:
-	#	print row["time"]
-		print "%-25.25s %s %s %s" % (row["user"], row["time"], row["vehicle"], row["sector_times"])
+	for track_name, track_id in pc2.track_by_name.iteritems():
+		try:
+			print "Getting leaderboard for %s [overall best]" % track_name
+			pc2.print_leaderboard(pc2.get_leaderboard(track_id))
+		except TypeError:
+			print "This leaderboard contains no data"
+		raw_input()
 
 	return 0
 
