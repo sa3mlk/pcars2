@@ -1,3 +1,3 @@
-# Project CARS 2 Leaderboard Scaper
+# Project CARS 2 Leaderboard Scraper
 
-TODO: Test and fix bugs.
+TODO: Unit tests and fix bugs.
