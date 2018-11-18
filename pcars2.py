@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
 from bs4 import BeautifulSoup, Tag
 from urllib2 import urlopen
@@ -57,10 +58,10 @@ class ProjectCARS2(object):
 		ms = sum(sector_times) if isinstance(sector_times, list) else sector_times
 		return "%02d:%02d.%03d" % (ms/(60*1000), (ms/1000)%60, ms%1000)
 
-	def get_leaderboard(self, track, vehicle=0):
+	def get_leaderboard(self, track, vehicle=0, index=1):
 		track = int(track)
 		vehicle = int(vehicle)
-		page = urlopen(self.baseurl + "/leaderboard?track=%d&vehicle=%d" % (track, vehicle))
+		page = urlopen(self.baseurl + "/leaderboard?track=%d&vehicle=%d&page=%d" % (track, vehicle, index))
 		soup = BeautifulSoup(page, "lxml")
 		page.close()
 
@@ -81,6 +82,10 @@ class ProjectCARS2(object):
 				"timestamp": get_td(tr, "timestamp").text
 			})
 
+		# Test for more pages
+		if len(leaderboard) == 100:
+			leaderboard += self.get_leaderboard(track, vehicle, index+1)
+
 		return sorted(leaderboard, key=itemgetter("time"))
 
 	def print_leaderboard(self, lb):
@@ -96,13 +101,17 @@ class ProjectCARS2(object):
 def main():
 	pc2 = ProjectCARS2()
 
-	for track_name, track_id in pc2.track_by_name.iteritems():
+	# Download the complete leaderboard for Nissan GT-R Nismo GT3 for Nürburgring Nordschleife
+	lb = pc2.get_leaderboard(697498609, 2878763807)
+	pc2.print_leaderboard(lb)
+
+	"""for track_name, track_id in pc2.track_by_name.iteritems():
 		try:
 			print "Getting leaderboard for %s [overall best]" % track_name
 			pc2.print_leaderboard(pc2.get_leaderboard(track_id))
 		except TypeError:
 			print "This leaderboard contains no data"
-		raw_input()
+		raw_input()"""
 
 	return 0
 
