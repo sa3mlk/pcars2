@@ -28,8 +28,15 @@ class ProjectCARS2(object):
 	def __get_vehicles(self):
 		select = self.__tags(self.soup.find(attrs={"id": "select_leaderboard_vehicle", "name": "vehicle"}))
 		vehicles = {}
+		dupe_counter = 1
 		for option in select:
-			vehicles[option.text] = int(option["value"])
+			# Test if the car is a duplicate (such as the Audi R18 and some others)
+			if option.text in vehicles:
+				# If there is a duplicate, append an underscore and integer to the vehicle name
+				vehicles["%s_%d" % (option.text, dupe_counter)] = int(option["value"])
+				dupe_counter += 1
+			else:
+				vehicles[option.text] = int(option["value"])
 		return vehicles
 
 	def __get_tracks(self):
